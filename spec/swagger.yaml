@@ -25,7 +25,7 @@ info:
     Once your token expires, you can get another by recalling the `TOKEN URL`
     
 
-  version: '0.0.1' # Your API version
+  version: '0.0.2' # Your API version
   # It can be any string but it is better to use semantic versioning: http://semver.org/
   # Warning: OpenAPI require version to be string, but without quotation YAML can recognize it as number.
 
@@ -136,6 +136,10 @@ paths:
                 - IL6
                 - LACC1
                 - MIF
+                prevalence_info:
+                  europe_only: true
+                  type: prevalence
+                  value: 5
                 references:
                 - db: OMIM
                   id: '604302'
@@ -145,6 +149,10 @@ paths:
                 title: SYSTEMIC-ONSET JUVENILE IDIOPATHIC ARTHRITIS
                 type: disease
               - genes: []
+                prevalence_info:
+                  europe_only: false
+                  type: cases
+                  value: 150
                 references:
                 - db: ORPHANET
                   id: '37748'
@@ -192,6 +200,11 @@ definitions:
   Result:
     type: object
     description: A mendelian result object. This either represents a disease which is indicative of the query phenotypes or a potentially causative gene.
+    required:
+      - title
+      - references
+      - score
+      - type
     properties:
       title:
         type: string
@@ -210,6 +223,19 @@ definitions:
       score:
         type: number
         description: A relevance score for this result
+      prevalence_info:
+        type: object
+        properties:
+          type:
+            type: string
+            enum: [prevalence, birth prevalence, incidence, cases, families]
+            description: The type of metric that has been recorded for this result
+          value:
+            type: number
+            description: The magnitude for this metric. In the case of prevalence, birth prevalence or incidence it represents the affected patients per 100,000 in the population. For cases and families it represents the absolute number that have been seen in publications
+          europe_only:
+            type: boolean
+            description: Whether the above values apply worldwide or to Europe only
       type:
         type: string
         enum: [disease, gene]
