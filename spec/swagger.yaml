@@ -29,7 +29,7 @@ info:
   # It can be any string but it is better to use semantic versioning: http://semver.org/
   # Warning: OpenAPI require version to be string, but without quotation YAML can recognize it as number.
 
-  title: Mendelian Search # Replace with your API title
+  title: Search API # Replace with your API title
   # Keep it simple. Don't add "API" or verison at the end of the string.
 
   termsOfService: 'https://www.mendelian.co/pages/terms' # [Optional] Replace with an URL to your ToS
@@ -53,7 +53,7 @@ securityDefinitions:
   Application: # security definition name (you can name it as you want)
     type: oauth2 # authorization type, one of: oauth2, basic, apiKey
     flow: application
-    tokenUrl: 'https://www.mendelian.co/api/auth/token/'
+    tokenUrl: 'https://app.mendelian.co/api/auth/token/'
     scopes:
       'read': Grants read access
 
@@ -74,6 +74,7 @@ paths:
         in: query
         description: The number of results to return
         type: integer
+        maximum: 500
       - name: pretty
         in: query # place where paramter is passed: path, header, query or body, formData
         description: Pretty print response
@@ -109,10 +110,79 @@ paths:
           examples:
           # repsonse samples for each type operation produces
             application/json:
-              username: user1
-              email: user@example.c
+              meta:
+                build: "17-09-21-09:27"
+                q: HP:0000988,HP:0001369
+                size: 5
+              results:
+              - genes: []
+                references:
+                - db: ORPHANET
+                  id: '231'
+                - db: DOID
+                  id: '14418'
+                score: 0.64
+                title: DRACUNCULIASIS
+                type: disease
+              - genes: []
+                references:
+                - db: OMIM
+                  id: '216950'
+                score: 0.64
+                title: COMPLEMENT COMPONENT C1R/C1S DEFICIENCY
+                type: disease
+              - genes:
+                - HLA-DRB1
+                - IL6
+                - LACC1
+                - MIF
+                references:
+                - db: OMIM
+                  id: '604302'
+                - db: ORPHANET
+                  id: '85414'
+                score: 0.64
+                title: SYSTEMIC-ONSET JUVENILE IDIOPATHIC ARTHRITIS
+                type: disease
+              - genes: []
+                references:
+                - db: ORPHANET
+                  id: '37748'
+                - db: DOID
+                  id: '4371'
+                score: 0.63
+                title: SCHNITZLER SYNDROME
+                type: disease
+              - genes: []
+                references:
+                - db: DOID
+                  id: '60127'
+                score: 0.63
+                title: GAMMA HEAVY CHAIN DISEASE
+                type: disease
+              status: success
         '403':
           description: Authentication failure
+        '412':
+          description: Invalid inputs
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                description: Always 'error'
+              reason:
+                type: string
+                description: Human readable description of the error
+              reason_code:
+                type: string
+                description: Shortened code for the error
+          examples:
+            application/json:
+              status: error
+              reason: "The 'q' query parameter must be a comma separated list of hpo terms in the form 'HP:XXXXXXX,HP:YYYYYYY'"
+              reason_code: invalid_parameter
+              
               
   
 
@@ -134,7 +204,6 @@ definitions:
             db:
               type: string
               description: The public database that lists this result
-              example: OMIM
             id:
               type: string
               description: The ID of the database that represents this result
