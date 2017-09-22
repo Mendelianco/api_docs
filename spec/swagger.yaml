@@ -12,6 +12,18 @@ info:
     This is the documentation for Mendelian's Search API.
     # Introduction
     This API is for developers to integrate Mendelian's search with their applications. You will be able to query HPO features to find the most relevant diseases and genes along with reference information for research purposes.
+    
+    # Getting Access
+    This is currently a closed API but getting set up is easy as pie. Requests to this API are protected with token-based security scheme. Contact us at [contact@mendelian.co](mailto:contact@mendelian.co) if you would like a set of API keys. Once you have them you can get a token with a call like this:
+    
+    `curl -X POST -d "grant_type=client_credentials" -u "<client_id>:<client_secret>" TOKEN URL`
+    
+    You can then use your token to access the API as follows:
+    
+    `curl -H "Authorization: Bearer XXXXXX" "https://mendelian.co/api/v0/search/?q=HP:0000988,HP:0001369&pretty"`
+    
+    Once your token expires, you can get another by recalling the `TOKEN URL`
+    
 
   version: '0.0.1' # Your API version
   # It can be any string but it is better to use semantic versioning: http://semver.org/
@@ -38,20 +50,12 @@ produces:
   # you can add any mime type your API produces to the list
 
 securityDefinitions:
-  main_auth: # security definition name (you can name it as you want)
+  Application: # security definition name (you can name it as you want)
     type: oauth2 # authorization type, one of: oauth2, basic, apiKey
-    # the following options are specific to oauth2 type
-    authorizationUrl: 'https://www.mendelian.co/api/auth/token/'
-    flow: implicit
+    flow: application
+    tokenUrl: 'https://www.mendelian.co/api/auth/token/'
     scopes:
-      'read': read search results
-  api_key: # security definition name (you can name it as you want)
-    type: apiKey
-    # The following options are specific to apiKey type
-    in: header # Where API key will be passed: header or query
-    name: api_key # API key paramteer name
-  basic_auth: # security definition name (you can name it as you want)
-    type: basic
+      'read': Grants read access
 
 # Holds the relative paths to the individual endpoints. The path is appended to the
 # basePath in order to construct the full URL. 
@@ -92,9 +96,8 @@ paths:
       
       # security schemas applied to this operation
       security:
-        - main_auth:
+        - Application:
           - 'read' # for auth2 provide list of scopes here
-        - api_key: []
       # overwriting default global produces
       produces:
         - application/json
