@@ -16,11 +16,11 @@ info:
     # Getting Access
     This is currently a closed API but getting set up is easy as pie. Requests to this API are protected with token-based security scheme. Contact us at [contact@mendelian.co](mailto:contact@mendelian.co) if you would like a set of API keys. Once you have them you can get a token with a call like this:
     
-    `curl -X POST -d "grant_type=client_credentials" -u "<client_id>:<client_secret>" TOKEN URL`
+    `curl -X POST -d "grant_type=client_credentials" -u "<client_id>:<client_secret>" <token_url>`
     
     You can then use your token to access the API as follows:
     
-    `curl -H "Authorization: Bearer XXXXXX" "https://mendelian.co/api/v0/search/?q=HP:0000988,HP:0001369&pretty"`
+    `curl -H "Authorization: Bearer <bearer_token>" "https://app.mendelian.co/api/v0/search/?q=HP:0000988,HP:0001369&pretty"`
     
     Once your token expires, you can get another by recalling the `TOKEN URL`
     
