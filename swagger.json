@@ -1,0 +1,364 @@
+{
+  "swagger": "2.0",
+  "schemes": [
+    "https"
+  ],
+  "host": "mendelian.co",
+  "basePath": "/api/v0/",
+  "info": {
+    "description": "This is the documentation for Mendelian's Search API.\n# Introduction\nThis API is for developers to integrate Mendelian's search with their applications. You will be able to query HPO features to find the most relevant diseases and genes along with reference information for research purposes.\n\n# Getting Access\nThis is currently a closed API but getting set up is easy as pie. Requests to this API are protected with token-based security scheme. Contact us at [contact@mendelian.co](mailto:contact@mendelian.co) if you would like a set of API keys. Once you have them you can get a token with a call like this:\n\n`curl -X POST -d \"grant_type=client_credentials\" -u \"<client_id>:<client_secret>\" <token_url>`\n\nYou can then use your token to access the API as follows:\n\n`curl -H \"Authorization: Bearer <bearer_token>\" \"https://app.mendelian.co/api/v0/search/?q=HP:0000988,HP:0001369&pretty\"`\n\nOnce your token expires, you can get another by recalling the `TOKEN URL`\n",
+    "version": "0.0.2",
+    "title": "Search API",
+    "termsOfService": "https://www.mendelian.co/pages/terms",
+    "contact": {
+      "email": "contact@mendelian.co"
+    },
+    "x-logo": {
+      "url": "https://app.mendelian.co/static/pheno/logo_dark.png"
+    }
+  },
+  "produces": [
+    "application/json"
+  ],
+  "securityDefinitions": {
+    "Application": {
+      "type": "oauth2",
+      "flow": "application",
+      "tokenUrl": "https://app.mendelian.co/api/auth/token/",
+      "scopes": {
+        "read": "Grants read access"
+      }
+    }
+  },
+  "paths": {
+    "/search": {
+      "parameters": [
+        {
+          "name": "q",
+          "in": "query",
+          "description": "A comma separated string of HPO ids",
+          "type": "integer",
+          "required": true
+        },
+        {
+          "name": "size",
+          "in": "query",
+          "description": "The number of results to return",
+          "type": "integer",
+          "maximum": 500
+        },
+        {
+          "name": "pretty",
+          "in": "query",
+          "description": "Pretty print response",
+          "type": "boolean"
+        }
+      ],
+      "get": {
+        "tags": [
+          "Search"
+        ],
+        "summary": "Get search results",
+        "operationId": "getResults",
+        "security": [
+          {
+            "Application": [
+              "read"
+            ]
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/SearchResponse"
+            },
+            "examples": {
+              "application/json": {
+                "meta": {
+                  "build": "17-09-21-09:27",
+                  "q": "HP:0000988,HP:0001369",
+                  "size": 5
+                },
+                "results": [
+                  {
+                    "genes": [],
+                    "references": [
+                      {
+                        "db": "ORPHANET",
+                        "id": "231"
+                      },
+                      {
+                        "db": "DOID",
+                        "id": "14418"
+                      }
+                    ],
+                    "score": 0.64,
+                    "title": "DRACUNCULIASIS",
+                    "type": "disease"
+                  },
+                  {
+                    "genes": [],
+                    "references": [
+                      {
+                        "db": "OMIM",
+                        "id": "216950"
+                      }
+                    ],
+                    "score": 0.64,
+                    "title": "COMPLEMENT COMPONENT C1R/C1S DEFICIENCY",
+                    "type": "disease"
+                  },
+                  {
+                    "genes": [
+                      {
+                        "symbol": "HLA-DRB1",
+                        "references": [
+                          {
+                            "db": "OMIM",
+                            "id": "216950"
+                          }
+                        ]
+                      },
+                      {
+                        "symbol": "IL6",
+                        "references": [
+                          {
+                            "db": "HGNC",
+                            "id": "236260"
+                          }
+                        ]
+                      },
+                      {
+                        "symbol": "LACC1",
+                        "references": [
+                          {
+                            "db": "NCBIGENE",
+                            "id": "216950"
+                          }
+                        ]
+                      },
+                      {
+                        "symbol": "MIF",
+                        "references": [
+                          {
+                            "db": "OMIM",
+                            "id": "102350"
+                          }
+                        ]
+                      }
+                    ],
+                    "prevalence_info": {
+                      "europe_only": true,
+                      "type": "prevalence",
+                      "value": 5
+                    },
+                    "references": [
+                      {
+                        "db": "OMIM",
+                        "id": "604302"
+                      },
+                      {
+                        "db": "ORPHANET",
+                        "id": "85414"
+                      }
+                    ],
+                    "score": 0.64,
+                    "title": "SYSTEMIC-ONSET JUVENILE IDIOPATHIC ARTHRITIS",
+                    "type": "disease"
+                  },
+                  {
+                    "genes": [],
+                    "prevalence_info": {
+                      "europe_only": false,
+                      "type": "cases",
+                      "value": 150
+                    },
+                    "references": [
+                      {
+                        "db": "ORPHANET",
+                        "id": "37748"
+                      },
+                      {
+                        "db": "DOID",
+                        "id": "4371"
+                      }
+                    ],
+                    "score": 0.63,
+                    "title": "SCHNITZLER SYNDROME",
+                    "type": "disease"
+                  },
+                  {
+                    "genes": [],
+                    "references": [
+                      {
+                        "db": "DOID",
+                        "id": "60127"
+                      }
+                    ],
+                    "score": 0.63,
+                    "title": "GAMMA HEAVY CHAIN DISEASE",
+                    "type": "disease"
+                  }
+                ],
+                "status": "success"
+              }
+            }
+          },
+          "403": {
+            "description": "Authentication failure"
+          },
+          "412": {
+            "description": "Invalid inputs",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string",
+                  "description": "Always 'error'"
+                },
+                "reason": {
+                  "type": "string",
+                  "description": "Human readable description of the error"
+                },
+                "reason_code": {
+                  "type": "string",
+                  "description": "Shortened code for the error"
+                }
+              }
+            },
+            "examples": {
+              "application/json": {
+                "status": "error",
+                "reason": "The 'q' query parameter must be a comma separated list of hpo terms in the form 'HP:XXXXXXX,HP:YYYYYYY'",
+                "reason_code": "invalid_parameter"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Result": {
+      "type": "object",
+      "description": "A mendelian result object. This either represents a disease which is indicative of the query phenotypes or a potentially causative gene.",
+      "required": [
+        "title",
+        "references",
+        "score",
+        "type"
+      ],
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "The name of the result"
+        },
+        "references": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "db": {
+                "type": "string",
+                "description": "The public database that lists this result"
+              },
+              "id": {
+                "type": "string",
+                "description": "The ID of the database that represents this result"
+              }
+            }
+          }
+        },
+        "score": {
+          "type": "number",
+          "description": "A relevance score for this result"
+        },
+        "prevalence_info": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "description": "Textual description of the prevalence"
+            }
+          }
+        },
+        "genes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "symbol": {
+                "type": "string",
+                "description": "The HGNC approved gene symbol for this gene"
+              },
+              "references": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "db": {
+                      "type": "string",
+                      "description": "The public database that lists this gene"
+                    },
+                    "id": {
+                      "type": "string",
+                      "description": "The ID of the database that represents this gene"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "disease",
+            "gene"
+          ]
+        }
+      }
+    },
+    "SearchMetaData": {
+      "type": "object",
+      "description": "Meta information about a search",
+      "properties": {
+        "q": {
+          "description": "The requested search terms",
+          "type": "string",
+          "example": "HP:0000988,HP:0001369"
+        },
+        "size": {
+          "description": "the requested result size",
+          "type": "integer",
+          "example": 50
+        }
+      }
+    },
+    "SearchResponse": {
+      "type": "object",
+      "properties": {
+        "meta": {
+          "$ref": "#/definitions/SearchMetaData"
+        },
+        "results": {
+          "description": "Search results",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Result"
+          }
+        },
+        "status": {
+          "description": "status code",
+          "type": "string",
+          "minLength": 1,
+          "example": "Success"
+        }
+      }
+    }
+  }
+}

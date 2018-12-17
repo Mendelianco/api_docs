@@ -1,0 +1,268 @@
+
+swagger: '2.0'
+# You should specify common part of your endpoints in the following format:
+#   <schemes>://<host><basepath>
+schemes:
+  - https # Remove if your API donsn't support HTTPS
+host: mendelian.co # Replace with your hostname. You can also specify port e.g. example.com:777
+basePath: /api/v0/ # Replace with your basePath. Note: SHOULD begin with '/'.
+info:
+  # Describe your API here, you can use GFM (https://guides.github.com/features/mastering-markdown) here
+  description: |
+    This is the documentation for Mendelian's Search API.
+    # Introduction
+    This API is for developers to integrate Mendelian's search with their applications. You will be able to query HPO features to find the most relevant diseases and genes along with reference information for research purposes.
+    
+    # Getting Access
+    This is currently a closed API but getting set up is easy as pie. Requests to this API are protected with token-based security scheme. Contact us at [contact@mendelian.co](mailto:contact@mendelian.co) if you would like a set of API keys. Once you have them you can get a token with a call like this:
+    
+    `curl -X POST -d "grant_type=client_credentials" -u "<client_id>:<client_secret>" <token_url>`
+    
+    You can then use your token to access the API as follows:
+    
+    `curl -H "Authorization: Bearer <bearer_token>" "https://app.mendelian.co/api/v0/search/?q=HP:0000988,HP:0001369&pretty"`
+    
+    Once your token expires, you can get another by recalling the `TOKEN URL`
+    
+
+  version: '0.0.2' # Your API version
+  # It can be any string but it is better to use semantic versioning: http://semver.org/
+  # Warning: OpenAPI require version to be string, but without quotation YAML can recognize it as number.
+
+  title: Search API # Replace with your API title
+  # Keep it simple. Don't add "API" or verison at the end of the string.
+
+  termsOfService: 'https://www.mendelian.co/pages/terms' # [Optional] Replace with an URL to your ToS
+  contact:
+    email: contact@mendelian.co # [Optional] Replace with your contact email
+    #url: 'http://example.com/contact' # [Optional] Replace with link to your contact form
+  #license:
+    #name: Apache 2.0
+    #url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+  x-logo:
+    url: 'https://s3.amazonaws.com/mendelian/static/pheno/logo_dark-12f6efd7a95fa0725727d4b408de9fed.png'
+
+produces:
+  # List of mime types your API endpoins can return.
+  # This is a global default. You can OVERWRITE it in each specific operation.
+  # Remove the ones not used in your API
+  - application/json
+  # you can add any mime type your API produces to the list
+
+securityDefinitions:
+  Application: # security definition name (you can name it as you want)
+    type: oauth2 # authorization type, one of: oauth2, basic, apiKey
+    flow: application
+    tokenUrl: 'https://app.mendelian.co/api/auth/token/'
+    scopes:
+      'read': Grants read access
+
+# Holds the relative paths to the individual endpoints. The path is appended to the
+# basePath in order to construct the full URL. 
+paths:
+  '/search': # path parameter in curly braces
+    # documentation for GET operation for this path
+    
+    # parameters list that are used with each operation for this path
+    parameters:
+      - name: q
+        in: query
+        description: A comma separated string of HPO ids
+        type: integer
+        required: true
+      - name: size
+        in: query
+        description: The number of results to return
+        type: integer
+        maximum: 500
+      - name: pretty
+        in: query # place where paramter is passed: path, header, query or body, formData
+        description: Pretty print response
+        # type of the paramter: string, number, integer, boolean, array
+        type: boolean
+    get:
+      tags:
+        - Search
+      
+      # summary is up to 120 symbold but we recommend to be shortest as possible
+      summary: Get search results
+      
+      # you can use GFM in operation description too: https://guides.github.com/features/mastering-markdown
+      #description: | 
+      #  Some description of the operation. 
+      #  You can use `markdown` here.
+      
+      # operationId should be unique across the whole specification
+      operationId: getResults
+      
+      # security schemas applied to this operation
+      security:
+        - Application:
+          - 'read' # for auth2 provide list of scopes here
+      # overwriting default global produces
+      produces:
+        - application/json
+      responses: # list of responses
+        '200':
+          description: Success
+          schema: # response schema can be specified for each response
+            $ref: '#/definitions/SearchResponse'
+          examples:
+          # repsonse samples for each type operation produces
+            application/json:
+              meta:
+                build: "17-09-21-09:27"
+                q: HP:0000988,HP:0001369
+                size: 5
+              results:
+              - genes: []
+                references:
+                - db: ORPHANET
+                  id: '231'
+                - db: DOID
+                  id: '14418'
+                score: 0.64
+                title: DRACUNCULIASIS
+                type: disease
+              - genes: []
+                references:
+                - db: OMIM
+                  id: '216950'
+                score: 0.64
+                title: COMPLEMENT COMPONENT C1R/C1S DEFICIENCY
+                type: disease
+              - genes:
+                - HLA-DRB1
+                - IL6
+                - LACC1
+                - MIF
+                prevalence_info:
+                  europe_only: true
+                  type: prevalence
+                  value: 5
+                references:
+                - db: OMIM
+                  id: '604302'
+                - db: ORPHANET
+                  id: '85414'
+                score: 0.64
+                title: SYSTEMIC-ONSET JUVENILE IDIOPATHIC ARTHRITIS
+                type: disease
+              - genes: []
+                prevalence_info:
+                  europe_only: false
+                  type: cases
+                  value: 150
+                references:
+                - db: ORPHANET
+                  id: '37748'
+                - db: DOID
+                  id: '4371'
+                score: 0.63
+                title: SCHNITZLER SYNDROME
+                type: disease
+              - genes: []
+                references:
+                - db: DOID
+                  id: '60127'
+                score: 0.63
+                title: GAMMA HEAVY CHAIN DISEASE
+                type: disease
+              status: success
+        '403':
+          description: Authentication failure
+        '412':
+          description: Invalid inputs
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                description: Always 'error'
+              reason:
+                type: string
+                description: Human readable description of the error
+              reason_code:
+                type: string
+                description: Shortened code for the error
+          examples:
+            application/json:
+              status: error
+              reason: "The 'q' query parameter must be a comma separated list of hpo terms in the form 'HP:XXXXXXX,HP:YYYYYYY'"
+              reason_code: invalid_parameter
+              
+              
+  
+
+# An object to hold data types that can be consumed and produced by operations.
+# These data types can be primitives, arrays or models.
+definitions:
+  Result:
+    type: object
+    description: A mendelian result object. This either represents a disease which is indicative of the query phenotypes or a potentially causative gene.
+    required:
+      - title
+      - references
+      - score
+      - type
+    properties:
+      title:
+        type: string
+        description: The name of the result
+      references:
+        type: array
+        items:
+          type: object
+          properties:
+            db:
+              type: string
+              description: The public database that lists this result
+            id:
+              type: string
+              description: The ID of the database that represents this result
+      score:
+        type: number
+        description: A relevance score for this result
+      prevalence_info:
+        type: object
+        properties:
+          type:
+            type: string
+            enum: [prevalence, birth prevalence, incidence, cases, families]
+            description: The type of metric that has been recorded for this result
+          value:
+            type: number
+            description: The magnitude for this metric. In the case of prevalence, birth prevalence or incidence it represents the affected patients per 100,000 in the population. For cases and families it represents the absolute number that have been seen in publications
+          europe_only:
+            type: boolean
+            description: Whether the above values apply worldwide or to Europe only
+      type:
+        type: string
+        enum: [disease, gene]
+  SearchMetaData:
+    type: object
+    description: Meta information about a search
+    properties:
+      q:
+        description: The requested search terms
+        type: string
+        example: "HP:0000988,HP:0001369"
+      size:
+        description: the requested result size
+        type: integer
+        example: 50
+  SearchResponse:
+    type: object
+    properties:
+      meta:
+        $ref: '#/definitions/SearchMetaData'
+      results:
+        description: Search results
+        type: array
+        items:
+          $ref: '#/definitions/Result'
+      status:
+        description: status code
+        type: string
+        minLength: 1
+        example: Success
