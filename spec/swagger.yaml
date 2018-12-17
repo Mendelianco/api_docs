@@ -40,7 +40,7 @@ info:
     #name: Apache 2.0
     #url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
   x-logo:
-    url: 'https://s3.amazonaws.com/mendelian/static/pheno/logo_dark-12f6efd7a95fa0725727d4b408de9fed.png'
+    url: 'https://app.mendelian.co/static/pheno/logo_dark.png'
 
 produces:
   # List of mime types your API endpoins can return.
@@ -132,10 +132,22 @@ paths:
                 title: COMPLEMENT COMPONENT C1R/C1S DEFICIENCY
                 type: disease
               - genes:
-                - HLA-DRB1
-                - IL6
-                - LACC1
-                - MIF
+                - symbol: 'HLA-DRB1'
+                  references:
+                    - db: 'OMIM'
+                      id: '216950'
+                - symbol: 'IL6'
+                  references:
+                    - db: 'HGNC'
+                      id: '236260'
+                - symbol: 'LACC1'
+                  references:
+                    - db: 'NCBIGENE'
+                      id: '216950'
+                - symbol: 'MIF'
+                  references:
+                    - db: 'OMIM'
+                      id: '102350'
                 prevalence_info:
                   europe_only: true
                   type: prevalence
@@ -228,14 +240,26 @@ definitions:
         properties:
           type:
             type: string
-            enum: [prevalence, birth prevalence, incidence, cases, families]
-            description: The type of metric that has been recorded for this result
-          value:
-            type: number
-            description: The magnitude for this metric. In the case of prevalence, birth prevalence or incidence it represents the affected patients per 100,000 in the population. For cases and families it represents the absolute number that have been seen in publications
-          europe_only:
-            type: boolean
-            description: Whether the above values apply worldwide or to Europe only
+            description: Textual description of the prevalence
+      genes:
+        type: array 
+        items:
+          type: object
+          properties:
+            symbol:
+              type: string
+              description: The HGNC approved gene symbol for this gene
+            references:
+              type: array
+              items:
+                type: object
+                properties:
+                  db:
+                    type: string
+                    description: The public database that lists this gene
+                  id:
+                    type: string
+                    description: The ID of the database that represents this gene
       type:
         type: string
         enum: [disease, gene]
